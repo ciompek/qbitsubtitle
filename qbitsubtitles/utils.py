@@ -1,8 +1,8 @@
 import re
 import requests
-from download import HEADERS, DOWNLOAD_URL
 
 def compute_hash(file_path):
+    """Compute a simple hash for OpenSubtitles."""
     try:
         with open(file_path, "rb") as f:
             data = f.read(64 * 1024)
@@ -16,6 +16,7 @@ def clean_title(title):
     return title
 
 def build_query(info, video_name):
+    """Build a query string based on guessit info."""
     parts = []
     title = clean_title(info.get("title", video_name))
     parts.append(title)
@@ -37,10 +38,11 @@ def build_query(info, video_name):
         parts.append(release_group)
     return " ".join(parts)
 
-def get_first_file_link(subtitle_data):
+def get_first_file_link(subtitle_data, headers, download_url):
+    """Get the download link of the first subtitle file."""
     files = subtitle_data["attributes"].get("files", [])
     if not files:
         return None
     file_id = files[0]["file_id"]
-    r = requests.post(DOWNLOAD_URL, headers=HEADERS, json={"file_id": file_id})
+    r = requests.post(download_url, headers=headers, json={"file_id": file_id})
     return r.json().get("link")
