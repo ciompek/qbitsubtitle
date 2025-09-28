@@ -17,12 +17,18 @@ cp download_subtitles.py run_subtitles.sh /opt/subtitles/
 chmod +x /opt/subtitles/download_subtitles.py
 chmod +x /opt/subtitles/run_subtitles.sh
 
-# Create config.env if it doesn't exist
+# Create config.env interactively
 CONFIG_FILE="/opt/subtitles/config.env"
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "Creating config.env..."
-    cp config.env.example $CONFIG_FILE
-    echo "Edit $CONFIG_FILE and set your API key and default language."
-fi
+echo "Creating configuration file at $CONFIG_FILE"
 
-echo "✅ Installation complete. Configure your API key in /opt/subtitles/config.env."
+# Ask user for API key
+read -p "Enter your OpenSubtitles API key: " USER_API_KEY
+# Ask user for default subtitle language
+read -p "Enter your default subtitle language (e.g., pl, en): " USER_LANG
+
+cat > "$CONFIG_FILE" <<EOL
+API_KEY=$USER_API_KEY
+DEFAULT_LANG=$USER_LANG
+EOL
+
+echo "✅ Installation complete. Configuration saved to $CONFIG_FILE."
