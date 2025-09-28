@@ -11,12 +11,12 @@ read -p "Enter default subtitle language (e.g., pl, en): " DEFAULT_LANG
 
 # Create main folder
 INSTALL_DIR="/opt/subtitles"
-MODULE_DIR="$INSTALL_DIR/qbitsubtitles"
+MODULE_DIR="$INSTALL_DIR/app"
 mkdir -p "$MODULE_DIR"
 
 # Copy scripts and module files to /opt/subtitles
 # Assumes you run install.sh from repo root
-cp -r qbitsubtitles/* "$MODULE_DIR"
+cp -r app/* "$MODULE_DIR"
 cp run_subtitles.sh "$INSTALL_DIR"
 chmod +x "$INSTALL_DIR/run_subtitles.sh"
 
