@@ -9,5 +9,5 @@ if [ -z "$FOLDER" ]; then
     exit 1
 fi
 
-# Run the Python script
+# Run Python script
 python3 /opt/subtitles/download_subtitles.py "$FOLDER" --debug
