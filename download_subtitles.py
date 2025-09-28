@@ -13,7 +13,7 @@ CONFIG_FILE = "/opt/subtitles/config.env"
 LOG_FILE = "/var/log/subtitles.log"
 
 API_KEY = None
-DEFAULT_LANG = "en"  # default fallback
+DEFAULT_LANG = "en"
 
 # ---------------- LOAD CONFIG ----------------
 if os.path.exists(CONFIG_FILE):
@@ -30,7 +30,7 @@ if not API_KEY:
 
 HEADERS = {
     "Api-Key": API_KEY,
-    "User-Agent": "download-subtitles v1.0",
+    "User-Agent": "qbitsubtitles v1.0",
     "Accept": "application/json"
 }
 
@@ -91,14 +91,12 @@ def compute_hash(file_path):
         if filesize < 65536 * 2:
             raise Exception("File too small to compute hash")
 
-        # first 64KB
         for _ in range(65536 // bytesize):
             buffer = f.read(bytesize)
             (l,) = struct.unpack(longlongformat, buffer)
             hash_val += l
             hash_val &= 0xFFFFFFFFFFFFFFFF
 
-        # last 64KB
         f.seek(max(0, filesize - 65536))
         for _ in range(65536 // bytesize):
             buffer = f.read(bytesize)
@@ -117,10 +115,9 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG, debug=False):
     lang_code = lang.lower()
     srt_path = video_path.with_name(f"{video_path.stem}.{lang_code}.srt")
 
-    # Skip if subtitle already exists
     if srt_path.exists():
         if debug:
-            print(f"ℹ️ Subtitle already exists: {srt_path.name}, skipping download.")
+            print(f"ℹ️ Subtitle already exists: {srt_path.name}, skipping.")
         return
 
     video_name = video_path.stem
@@ -156,7 +153,6 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG, debug=False):
 
     data = r.json().get("data", [])
     if not data and "moviehash" in params:
-        # Fallback if hash returns no results
         query = build_query(info, video_name)
         params.pop("moviehash")
         params["query"] = query
@@ -183,7 +179,6 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG, debug=False):
         return
 
     file_id = files[0]["file_id"]
-
     download_response = requests.post(DOWNLOAD_URL, headers=HEADERS, json={"file_id": file_id})
     log_to_file("POST", DOWNLOAD_URL, download_response.status_code)
     download_json = download_response.json()
@@ -203,7 +198,7 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG, debug=False):
 def main():
     parser = argparse.ArgumentParser(description="Download subtitles for movies and TV shows")
     parser.add_argument("folder", help="Path to torrent folder")
-    parser.add_argument("-d", "--debug", action="store_true", help="Display requests and responses in console")
+    parser.add_argument("-d", "--debug", action="store_true", help="Display requests/responses")
     args = parser.parse_args()
 
     folder = Path(args.folder)
