@@ -45,6 +45,10 @@ args = parser.parse_args()
 DEBUG = args.debug
 DEBUG_VERBOSE = args.debug_verbose
 
+def normalize(s):
+    """Normalize strings for release group matching."""
+    return s.replace('.', '').replace('-', '').replace(' ', '').lower() if s else ''
+
 def save_subtitle(path, url, method):
     if not url:
         print(f"❌ No download link found")
@@ -65,7 +69,7 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG):
     video_name = video_path.stem
     info = guessit(video_name)
     release_group = info.get("releaseGroup")
-    file_release_group = release_group.lower() if release_group else None
+    file_release_group = normalize(release_group)
     movie_hash = compute_hash(video_path)
 
     # 1️⃣ Try by hash
@@ -90,12 +94,11 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG):
     log_to_file(f"GET {r.url} status={r.status_code}")
     data = r.json().get("data", [])
 
-    # 3️⃣ Release group matching
     release_group_matches = []
     fallback_matches = []
 
     for d in data:
-        slug = d["attributes"].get("slug", "").lower()
+        slug = normalize(d["attributes"].get("slug", ""))
         if DEBUG_VERBOSE:
             print(f"📝 Checking slug: '{slug}' against file release group: '{file_release_group}'")
         if file_release_group and file_release_group in slug:
