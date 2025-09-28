@@ -1,13 +1,9 @@
 #!/bin/bash
-# run_subtitles.sh
-# Called by qBittorrent after a torrent finishes downloading
-
+# Usage: ./run_subtitles.sh /path/to/videos
 FOLDER="$1"
-
 if [ -z "$FOLDER" ]; then
-    echo "❌ No folder specified"
+    echo "❌ Please provide folder path"
     exit 1
 fi
 
-# Run Python script
-python3 /opt/subtitles/download_subtitles.py "$FOLDER" --debug
+python3 -m qbitsubtitles.download "$FOLDER" --debug
