@@ -5,6 +5,6 @@ Automatically downloads subtitles in your chosen language for movies and TV show
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_REPO/subtitles-autodownload.git
-cd subtitles-autodownload
+git clone https://github.com/ciompek/qbitsubtitle.git
+cd qbitsubtitle
 ./install.sh
