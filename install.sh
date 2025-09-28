@@ -1,39 +1,44 @@
 #!/bin/bash
+# Installer for qbitsubtitles v1.0
+SUBTITLES_DIR="/opt/subtitles"
+CONFIG_FILE="$SUBTITLES_DIR/config.env"
+
+mkdir -p "$SUBTITLES_DIR"
 clear
-echo "======================================"
-echo "       QBITSUBTITLES INSTALLER v1.0"
-echo "======================================"
-echo ""
+echo "=== qbitsubtitles v1.0 Installer ==="
 
-# Ask user for config
-read -p "Enter your OpenSubtitles API Key: " API_KEY
-read -p "Enter default subtitle language (e.g., pl, en): " DEFAULT_LANG
+# Python3 & pip
+echo "🔹 Installing Python3 and pip..."
+apt-get update && apt-get install -y python3 python3-pip
 
-# Create main folder
-INSTALL_DIR="/opt/subtitles"
-MODULE_DIR="$INSTALL_DIR/qbitsubtitles"
-mkdir -p "$MODULE_DIR"
+# Required packages
+echo "🔹 Installing required Python packages..."
+pip3 install --upgrade pip
+pip3 install requests guessit
 
-# Copy scripts and module files to /opt/subtitles
-# Assumes you run install.sh from repo root
-cp -r qbitsubtitles/* "$MODULE_DIR"
-cp run_subtitles.sh "$INSTALL_DIR"
-chmod +x "$INSTALL_DIR/run_subtitles.sh"
+# Config
+if [[ -f "$CONFIG_FILE" ]]; then
+    echo "ℹ️ Config file exists: $CONFIG_FILE"
+else
+    echo "🔹 Creating config file..."
+    touch "$CONFIG_FILE"
+fi
 
-# Create config.env
-cat > "$INSTALL_DIR/config.env" <<EOL
-API_KEY=$API_KEY
-DEFAULT_LANG=$DEFAULT_LANG
-EOL
+# Prompt for API_KEY if not set
+if ! grep -q "^API_KEY=" "$CONFIG_FILE"; then
+    read -p "Enter your OpenSubtitles API Key: " api_key
+    echo "API_KEY=$api_key" >> "$CONFIG_FILE"
+else
+    echo "ℹ️ API_KEY already set in config.env"
+fi
 
-# Install Python dependencies
-echo ""
-echo "Installing Python dependencies..."
-python3 -m pip install --upgrade pip
-python3 -m pip install -r requirements.txt
+# Prompt for DEFAULT_LANG if not set
+if ! grep -q "^DEFAULT_LANG=" "$CONFIG_FILE"; then
+    read -p "Enter default subtitle language (e.g. pl): " default_lang
+    echo "DEFAULT_LANG=$default_lang" >> "$CONFIG_FILE"
+else
+    echo "ℹ️ DEFAULT_LANG already set in config.env"
+fi
 
-echo ""
-echo "Installation completed!"
-echo "Configuration saved in $INSTALL_DIR/config.env"
-echo "Module files copied to $MODULE_DIR"
-echo "Run subtitles script via: $INSTALL_DIR/run_subtitles.sh /path/to/videos"
+echo "✅ Installation complete! Run subtitles with:"
+echo "   /opt/subtitles/run_subtitles.sh /path/to/videos"
