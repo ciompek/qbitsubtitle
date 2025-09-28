@@ -7,12 +7,12 @@ import requests
 from guessit import guessit
 from qbitsubtitles.utils import compute_hash, build_query, get_first_file_link
 from qbitsubtitles.logging import log_to_file
-from datetime import datetime
 
 CONFIG_FILE = "/opt/subtitles/config.env"
 HEADERS = {}
 DEFAULT_LANG = "pl"
 API_URL = "https://api.opensubtitles.com/api/v1/subtitles"
+DOWNLOAD_URL = "https://api.opensubtitles.com/api/v1/download"
 
 # Load config
 if not os.path.exists(CONFIG_FILE):
@@ -77,7 +77,7 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG):
         log_to_file(f"GET {r.url} status={r.status_code}")
         data = r.json().get("data", [])
         if data:
-            url = get_first_file_link(data[0])
+            url = get_first_file_link(data[0], HEADERS, DOWNLOAD_URL)
             save_subtitle(srt_path, url, "hash")
             return
 
@@ -113,7 +113,7 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG):
         print(f"❌ No subtitles found for {video_name}")
         return
 
-    url = get_first_file_link(chosen_dataset[0])
+    url = get_first_file_link(chosen_dataset[0], HEADERS, DOWNLOAD_URL)
     save_subtitle(srt_path, url, method)
     if DEBUG:
         print(f"ℹ️ Subtitles method used: {method}")
