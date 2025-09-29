@@ -68,8 +68,7 @@ def download_subtitles(video_path: Path, lang=DEFAULT_LANG):
 
     video_name = video_path.stem
     info = guessit(video_name)
-    release_group = info.get("releaseGroup")
-    file_release_group = normalize(release_group)
+    file_release_group = normalize(info.get("release_group"))
     movie_hash = compute_hash(video_path)
 
     # 1️⃣ Try by hash
