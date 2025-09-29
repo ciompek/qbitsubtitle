@@ -33,7 +33,7 @@ def build_query(info, video_name):
     source = info.get("source")
     if source:
         parts.append(source)
-    release_group = info.get("releaseGroup")
+    release_group = info.get("release_group")
     if release_group:
         parts.append(release_group)
     return " ".join(parts)
